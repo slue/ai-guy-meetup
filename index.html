@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Everyone Needs an AI Guy — Vienna Meetup</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --navy: #000F1E;
+      --white: #FFFFFF;
+      --gray: #6B7B8D;
+      --pink: #E8959E;
+      --purple: #5C3FED;
+      --yellow: #FFD57F;
+      --green: #E7FD92;
+      --green-sat: #B8D94A;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Space Grotesk', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Gradient bar ── */
+    .gradient-bar {
+      position: fixed; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--green), var(--yellow), var(--pink), var(--purple));
+      background-size: 300% 100%;
+      animation: gradFlow 8s linear infinite;
+      z-index: 1000;
+    }
+    @keyframes gradFlow { 0%{background-position:0% 0} 100%{background-position:300% 0} }
+
+    /* ── Nav ── */
+    nav {
+      position: fixed; top: 3px; left: 0; right: 0;
+      padding: 1.5rem 3rem;
+      display: flex; align-items: center; justify-content: space-between;
+      z-index: 100;
+      background: rgba(0,15,30,0.85);
+      backdrop-filter: blur(12px);
+    }
+    .nav-brand {
+      font-size: 1rem; font-weight: 800; letter-spacing: -0.02em; text-decoration: none;
+      color: var(--white); text-transform: uppercase;
+    }
+    .nav-tag {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; color: var(--gray);
+      text-transform: uppercase;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 4rem;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--green-sat);
+      border: 1px solid var(--green-sat); padding: 0.4rem 1rem;
+      margin-bottom: 2rem;
+      opacity: 0;
+    }
+    .hero-eyebrow::before {
+      content: ''; width: 6px; height: 6px;
+      background: var(--green-sat); border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .hero-title {
+      font-size: clamp(3rem, 10vw, 8rem);
+      font-weight: 800; line-height: 0.9;
+      letter-spacing: -0.03em;
+      text-transform: uppercase;
+      opacity: 0;
+    }
+    .hero-title .line-accent { color: var(--yellow); display: block; }
+    .hero-title .line-sub {
+      font-size: clamp(1.5rem, 4vw, 3.5rem);
+      font-weight: 300; color: var(--gray); letter-spacing: 0.05em;
+      display: block; margin-top: 0.5rem;
+    }
+
+    .hero-meta {
+      display: flex; align-items: center; gap: 3rem;
+      margin-top: 3rem;
+      font-size: 0.875rem; font-weight: 500; color: var(--gray);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      opacity: 0;
+    }
+    .hero-meta-item { display: flex; flex-direction: column; align-items: center; gap: 0.25rem; }
+    .hero-meta-item strong { color: var(--white); font-weight: 700; font-size: 1rem; }
+    .hero-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.15); }
+
+    .hero-cta {
+      margin-top: 3rem; opacity: 0;
+    }
+    .btn-apply {
+      display: inline-block;
+      background: var(--yellow); color: var(--navy);
+      font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+      padding: 1.2rem 3rem; text-decoration: none;
+      border: none; cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+    }
+    .btn-apply:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(255,213,127,0.3); }
+
+    .hero-spots {
+      margin-top: 1rem;
+      font-size: 0.75rem; font-weight: 500; color: var(--gray);
+      letter-spacing: 0.08em; text-transform: uppercase;
+    }
+    .hero-spots span { color: var(--pink); font-weight: 700; }
+
+    /* ── Scroll hint ── */
+    .scroll-hint {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+      font-size: 0.7rem; letter-spacing: 0.15em; color: var(--gray); text-transform: uppercase;
+      animation: bounce 2s infinite;
+    }
+    .scroll-hint svg { opacity: 0.5; }
+    @keyframes bounce { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(6px)} }
+
+    /* ── Section base ── */
+    section { padding: 8rem 2rem; }
+    .container { max-width: 1000px; margin: 0 auto; }
+    .section-label {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.2em;
+      color: var(--purple); text-transform: uppercase; margin-bottom: 1.5rem;
+    }
+    .section-title {
+      font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 800;
+      letter-spacing: -0.02em; text-transform: uppercase; line-height: 1;
+      margin-bottom: 2rem;
+    }
+    .section-body {
+      font-size: 1.125rem; font-weight: 300; color: rgba(255,255,255,0.7);
+      line-height: 1.8; max-width: 600px;
+    }
+
+    /* ── About ── */
+    .about { background: rgba(255,255,255,0.03); border-top: 1px solid rgba(255,255,255,0.06); }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start;
+    }
+    @media (max-width: 700px) { .about-grid { grid-template-columns: 1fr; gap: 2rem; } }
+
+    /* ── Format ── */
+    .format-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px; background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.08);
+      margin-top: 3rem;
+    }
+    .format-item {
+      background: var(--navy); padding: 2rem 1.5rem;
+      transition: background 0.2s;
+    }
+    .format-item:hover { background: rgba(92,63,237,0.15); }
+    .format-time {
+      font-size: 0.75rem; font-weight: 700; color: var(--yellow);
+      letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.75rem;
+    }
+    .format-name {
+      font-size: 1rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.02em; margin-bottom: 0.5rem;
+    }
+    .format-desc { font-size: 0.875rem; font-weight: 300; color: var(--gray); line-height: 1.6; }
+
+    /* ── Apply ── */
+    .apply { background: rgba(92,63,237,0.08); border-top: 1px solid rgba(92,63,237,0.2); }
+    .form-wrapper {
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      padding: 3rem; margin-top: 3rem;
+    }
+    .form-group { margin-bottom: 1.5rem; }
+    .form-label {
+      display: block; font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.15em; text-transform: uppercase; color: var(--gray);
+      margin-bottom: 0.5rem;
+    }
+    .form-input, .form-textarea {
+      width: 100%; background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--white); font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 300; padding: 0.875rem 1rem;
+      outline: none; transition: border-color 0.2s;
+    }
+    .form-input:focus, .form-textarea:focus { border-color: var(--purple); }
+    .form-input::placeholder, .form-textarea::placeholder { color: rgba(255,255,255,0.25); }
+    .form-textarea { resize: vertical; min-height: 120px; }
+    .form-note {
+      font-size: 0.8rem; font-weight: 300; color: var(--gray); margin-top: 0.5rem; line-height: 1.5;
+    }
+    .form-submit {
+      width: 100%; background: var(--purple); color: var(--white);
+      border: none; cursor: pointer;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 1.2rem; margin-top: 1rem;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .form-submit:hover { background: #4a32c4; transform: translateY(-1px); }
+    .form-submit:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .success-msg {
+      display: none; text-align: center; padding: 3rem;
+    }
+    .success-msg h3 {
+      font-size: 2rem; font-weight: 800; text-transform: uppercase; color: var(--green-sat);
+      margin-bottom: 1rem;
+    }
+    .success-msg p { font-weight: 300; color: var(--gray); line-height: 1.7; }
+
+    /* ── Location ── */
+    .location-box {
+      display: flex; gap: 3rem; align-items: flex-start;
+      background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+      padding: 3rem; margin-top: 3rem;
+    }
+    @media (max-width: 600px) { .location-box { flex-direction: column; gap: 2rem; } }
+    .location-icon { font-size: 3rem; flex-shrink: 0; }
+    .location-name { font-size: 1.5rem; font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem; }
+    .location-detail { font-size: 0.9rem; font-weight: 300; color: var(--gray); line-height: 1.7; }
+    .location-tag {
+      display: inline-block; margin-top: 0.75rem;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--yellow); border: 1px solid var(--yellow); padding: 0.3rem 0.75rem;
+    }
+
+    /* ── Footer ── */
+    footer {
+      padding: 3rem 2rem; text-align: center;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      font-size: 0.8rem; font-weight: 300; color: var(--gray);
+    }
+    footer a { color: var(--gray); text-decoration: none; }
+    footer a:hover { color: var(--white); }
+
+    /* ── Animations ── */
+    .reveal { opacity: 0; transform: translateY(30px); }
+  </style>
+</head>
+<body>
+  <div class="gradient-bar"></div>
+
+  <nav>
+    <a href="#" class="nav-brand">/makers_</a>
+    <span class="nav-tag">Vienna · April 2026</span>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-eyebrow" id="eyebrow">
+      Bewerbungs-Phase läuft
+    </div>
+    <h1 class="hero-title" id="heroTitle">
+      Everyone<br>
+      <span class="line-accent">Needs an</span>
+      <span class="line-accent">AI Guy_</span>
+      <span class="line-sub">Vienna Meetup · April 2026</span>
+    </h1>
+    <div class="hero-meta" id="heroMeta">
+      <div class="hero-meta-item">
+        <strong>25</strong>
+        <span>Plätze</span>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-meta-item">
+        <strong>Wien</strong>
+        <span>21. Stock</span>
+      </div>
+      <div class="hero-divider"></div>
+      <div class="hero-meta-item">
+        <strong>18:30</strong>
+        <span>Abendformat</span>
+      </div>
+    </div>
+    <div class="hero-cta" id="heroCta">
+      <a href="#apply" class="btn-apply">Jetzt bewerben →</a>
+      <p class="hero-spots">Nur <span>25 Plätze</span> — kuratierte Teilnehmer</p>
+    </div>
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about">
+    <div class="container about-grid">
+      <div>
+        <p class="section-label reveal">Was ist das hier?</p>
+        <h2 class="section-title reveal">Practitioners.<br>Keine Slides.<br>Über den Dächern.</h2>
+      </div>
+      <div class="section-body reveal" style="padding-top: 4rem;">
+        <p>Kein Konferenz-Feeling. Kein "Was ist ChatGPT?"-Workshop. Kein Tech-Nerd-Treffen.</p>
+        <br>
+        <p>Sondern: Leute die AI <em>wirklich</em> nutzen, zeigen Leuten die es lernen wollen, wie es geht. Hands-on, informal, mit Blick über Wien.</p>
+        <br>
+        <p>Du gehst als "AI Guy" deines Unternehmens raus — mit konkreten Tools, Workflows und dem Selbstvertrauen, AI im Alltag einzusetzen.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Format -->
+  <section>
+    <div class="container">
+      <p class="section-label reveal">Der Abend</p>
+      <h2 class="section-title reveal">2,5 Stunden.<br>Kein Bullshit.</h2>
+
+      <div class="format-grid">
+        <div class="format-item reveal">
+          <div class="format-time">18:30 — 19:00</div>
+          <div class="format-name">Ankommen</div>
+          <div class="format-desc">Drinks, Networking, "Meine AI-Superpower"-Namensschilder.</div>
+        </div>
+        <div class="format-item reveal">
+          <div class="format-time">19:00 — 19:10</div>
+          <div class="format-name">AI Guy Moment</div>
+          <div class="format-desc">Christoph zeigt 1 konkretes AI-Ergebnis aus seiner Woche. Live, kein Slide-Deck.</div>
+        </div>
+        <div class="format-item reveal">
+          <div class="format-time">19:10 — 19:40</div>
+          <div class="format-name">Live-Build</div>
+          <div class="format-desc">Ein Tool, ein Problem, live gelöst. Vor euren Augen. In 30 Minuten.</div>
+        </div>
+        <div class="format-item reveal">
+          <div class="format-time">19:40 — 20:10</div>
+          <div class="format-name">Show & Tell</div>
+          <div class="format-desc">3–4 Teilnehmer zeigen ihren besten AI-Use-Case. 5 Minuten, direkt aus der Praxis.</div>
+        </div>
+        <div class="format-item reveal">
+          <div class="format-time">20:10 — 20:30</div>
+          <div class="format-name">Tool-Roulette</div>
+          <div class="format-desc">3 Tools, 5 Minuten each. Diese Woche neu entdeckt. Direkt getestet.</div>
+        </div>
+        <div class="format-item reveal">
+          <div class="format-time">20:30 — 21:00</div>
+          <div class="format-name">Networking</div>
+          <div class="format-desc">Offener Austausch. Die besten Gespräche passieren hier. Mit Blick über Wien.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Apply -->
+  <section class="apply" id="apply">
+    <div class="container">
+      <p class="section-label reveal">Dabei sein</p>
+      <h2 class="section-title reveal">Kein offenes<br>Anmeldeformular._</h2>
+      <p class="section-body reveal">
+        Du bewirbst dich. Wir kuratieren. Das erzeugt Qualität — für die Show & Tell Runde und für den ganzen Abend.
+        25 Plätze. Keine Ausnahmen.
+      </p>
+
+      <div class="form-wrapper reveal">
+        <form id="formContainer" action="https://formsubmit.co/christoph@cambuildr.com" method="POST">
+          <!-- FormSubmit config -->
+          <input type="hidden" name="_subject" value="Neue AI Guy Meetup Bewerbung">
+          <input type="hidden" name="_captcha" value="false">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_next" value="">
+          <input type="text" name="_honey" style="display:none">
+
+          <div class="form-group">
+            <label class="form-label" for="name">Dein Name</label>
+            <input class="form-input" type="text" id="name" name="Name" placeholder="Vorname Nachname" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="email">Email</label>
+            <input class="form-input" type="email" id="email" name="Email" placeholder="du@company.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="company">Firma / Was du machst</label>
+            <input class="form-input" type="text" id="company" name="Firma" placeholder="Gründer bei X / Freelance Marketing / ...">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="usecase">Was kannst du in 10 Minuten zeigen?</label>
+            <textarea class="form-textarea" id="usecase" name="Use-Case" placeholder="Beschreib deinen besten AI-Workflow, ein Tool das du gebaut hast, oder einen Use-Case der wirklich funktioniert. Keine Bewerbungsfloskeln - wir wollen wissen was du wirklich tust." required></textarea>
+            <p class="form-note">→ Das ist der entscheidende Teil. Konkret schlägt alles andere.</p>
+          </div>
+          <button class="form-submit" type="submit" id="submitBtn">
+            Bewerbung absenden →
+          </button>
+        </form>
+        <div class="success-msg" id="successMsg">
+          <h3>Bewerbung erhalten ✓</h3>
+          <p>Wir melden uns in den nächsten Tagen mit einer Zu- oder Absage.<br>
+          Kein Spam. Versprochen.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Location -->
+  <section>
+    <div class="container">
+      <p class="section-label reveal">Location</p>
+      <h2 class="section-title reveal">21. Stock.<br>Wien Mitte.</h2>
+      <div class="location-box reveal">
+        <div class="location-icon">🏢</div>
+        <div>
+          <div class="location-name">The ICON Vienna</div>
+          <div class="location-detail">
+            Wiedner Gürtel 9, 1100 Wien<br>
+            21. Stockwerk — Blick über die ganze Stadt<br>
+            5 Min vom Hauptbahnhof / Wien Mitte
+          </div>
+          <div class="location-tag">U1 · U3 · U4 erreichbar</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Ein Event von <a href="https://makerslab.ai">/makers_</a> · Christoph Schleifer</p>
+    <p style="margin-top: 0.5rem;">Questions? <a href="mailto:christoph@cambuildr.com">christoph@cambuildr.com</a></p>
+  </footer>
+
+  <script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Hero entrance
+    gsap.timeline({ delay: 0.3 })
+      .to('#eyebrow', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' })
+      .to('#heroTitle', { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, '-=0.3')
+      .to('#heroMeta', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '-=0.4')
+      .to('#heroCta', { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' }, '-=0.4');
+
+    // Scroll reveals
+    gsap.utils.toArray('.reveal').forEach(el => {
+      gsap.to(el, {
+        opacity: 1, y: 0, duration: 0.7, ease: 'power2.out',
+        scrollTrigger: { trigger: el, start: 'top 85%', once: true }
+      });
+    });
+
+    // Form submit via AJAX
+    document.getElementById('formContainer').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Wird gesendet...';
+
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      })
+      .then(res => {
+        form.style.display = 'none';
+        document.getElementById('successMsg').style.display = 'block';
+      })
+      .catch(() => {
+        // Still show success - FormSubmit might redirect
+        form.style.display = 'none';
+        document.getElementById('successMsg').style.display = 'block';
+      });
+    });
+  </script>
+</body>
+</html>
